@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--color-background-tertiary,#f5f4f0);min-height:100vh;padding:1.5rem}
+.page-title{font-size:22px;font-weight:500;color:var(--color-text-primary);text-align:center;margin-bottom:6px}
+.page-sub{font-size:13px;color:var(--color-text-secondary);text-align:center;margin-bottom:1.5rem}
+.form-wrap{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--color-background-primary,#fff);border:0.5px solid var(--color-border-tertiary,rgba(0,0,0,.15));border-radius:12px;overflow:hidden}
+.card-head{padding:11px 18px;border-bottom:0.5px solid var(--color-border-tertiary,rgba(0,0,0,.1));display:flex;align-items:center;gap:10px}
+.card-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500}
+.card-title{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.card-body{padding:14px 18px;display:grid;gap:11px}
+.g2{grid-template-columns:1fr 1fr}.g4{grid-template-columns:1fr 1fr 1fr 1fr}
+.field{display:flex;flex-direction:column;gap:4px}
+.s2{grid-column:span 2}.s4{grid-column:span 4}
+label{font-size:11px;font-weight:500;color:var(--color-text-secondary);letter-spacing:.03em;text-transform:uppercase}
+input[type=text],input[type=date],input[type=datetime-local],select,textarea{width:100%;padding:7px 10px;font-size:14px;color:var(--color-text-primary);background:var(--color-background-secondary,#f8f7f3);border:0.5px solid var(--color-border-secondary,rgba(0,0,0,.2));border-radius:6px;outline:none;font-family:inherit;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--color-border-primary,rgba(0,0,0,.5));background:var(--color-background-primary)}
+textarea{min-height:68px;resize:vertical;line-height:1.6}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23999' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.badge-row{display:flex;flex-wrap:wrap;gap:7px}
+.badge-opt{position:relative}
+.badge-opt input{position:absolute;opacity:0;width:0;height:0}
+.badge-opt label{display:inline-block;padding:5px 12px;font-size:12px;font-weight:500;border:0.5px solid var(--color-border-secondary,rgba(0,0,0,.2));border-radius:20px;cursor:pointer;color:var(--color-text-secondary);background:var(--color-background-secondary);transition:all .15s;text-transform:none}
+.badge-opt input:checked+label{background:#E6F1FB;border-color:#378ADD;color:#0C447C}
+.people-list{display:flex;flex-direction:column;gap:8px}
+.person-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:center;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:8px 10px}
+.person-row select,.person-row input{background:var(--color-background-primary);margin:0}
+.btn-remove{width:28px;height:28px;border-radius:6px;border:0.5px solid var(--color-border-secondary);background:transparent;cursor:pointer;color:var(--color-text-secondary);font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.btn-remove:hover{background:#FCEBEB;border-color:#F09595;color:#A32D2D}
+.btn-add{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;font-weight:500;background:transparent;border:0.5px solid var(--color-border-secondary);border-radius:6px;cursor:pointer;color:var(--color-text-secondary);font-family:inherit;transition:all .15s;margin-top:4px}
+.btn-add:hover{background:var(--color-background-secondary)}
+.people-header{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;padding:0 10px}
+.people-header span{font-size:11px;font-weight:500;color:var(--color-text-secondary);letter-spacing:.03em;text-transform:uppercase}
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--color-background-primary,#fff);border-radius:12px;border:0.5px solid var(--color-border-tertiary);padding:24px;width:90%;max-width:460px}
+.modal-title{font-size:16px;font-weight:500;margin-bottom:5px;color:var(--color-text-primary)}
+.modal-sub{font-size:13px;color:var(--color-text-secondary);margin-bottom:16px;line-height:1.6}
+.modal .field{margin-bottom:11px}
+.modal label{font-size:11px;font-weight:500;color:var(--color-text-secondary);letter-spacing:.03em;display:block;margin-bottom:4px;text-transform:uppercase}
+.modal input{width:100%;padding:8px 10px;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:6px;outline:none;font-family:inherit;background:var(--color-background-secondary)}
+.modal input:focus{border-color:var(--color-border-primary);background:var(--color-background-primary)}
+.modal input[readonly]{color:var(--color-text-secondary);cursor:default}
+.tip{border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.7;margin-bottom:14px}
+.tip-blue{background:#E6F1FB;border:0.5px solid #B5D4F4;color:#185FA5}
+.tip-green{background:#EAF3DE;border:0.5px solid #C0DD97;color:#3B6D11}
+.tip-err{background:#FCEBEB;border:0.5px solid #F7C1C1;color:#A32D2D}
+.step-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);letter-spacing:.03em;text-transform:uppercase;margin-bottom:8px;display:block}
+.auth-btn{width:100%;padding:10px;font-size:13px;font-weight:500;background:#4285F4;border:none;border-radius:6px;cursor:pointer;color:#fff;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s}
+.auth-btn:hover{background:#2b6cb0}
+.auth-btn:disabled{background:#B5D4F4;cursor:not-allowed}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.btn-cancel{padding:8px 16px;font-size:13px;font-weight:500;background:transparent;border:0.5px solid var(--color-border-secondary);border-radius:6px;cursor:pointer;color:var(--color-text-secondary);font-family:inherit}
+.btn-cancel:hover{background:var(--color-background-secondary)}
+.btn-send{padding:8px 18px;font-size:13px;font-weight:500;background:#1B6B3A;border:none;border-radius:6px;cursor:pointer;color:#fff;font-family:inherit}
+.btn-send:hover{background:#085041}
+.btn-send:disabled{background:#9FE1CB;cursor:not-allowed}
+.divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:14px 0}
+/* Main actions */
+.actions{display:flex;gap:10px;justify-content:flex-end;padding:1rem 0 .25rem;flex-wrap:wrap}
+.btn-reset{padding:9px 18px;font-size:13px;font-weight:500;background:transparent;border:0.5px solid var(--color-border-secondary);border-radius:6px;cursor:pointer;color:var(--color-text-secondary);font-family:inherit}
+.btn-reset:hover{background:var(--color-background-secondary)}
+.btn-export{padding:9px 20px;font-size:13px;font-weight:500;background:#185FA5;border:none;border-radius:6px;cursor:pointer;color:#fff;font-family:inherit;display:inline-flex;align-items:center;gap:7px}
+.btn-export:hover{background:#0C447C}
+.btn-cloud{padding:9px 20px;font-size:13px;font-weight:500;background:#1B6B3A;border:none;border-radius:6px;cursor:pointer;color:#fff;font-family:inherit;display:inline-flex;align-items:center;gap:7px}
+.btn-cloud:hover{background:#085041}
+.legal-box{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:11px 15px;font-size:12px;color:var(--color-text-secondary);line-height:1.7}
+@media(max-width:600px){.g2,.g4{grid-template-columns:1fr}.s2,.s4{grid-column:span 1}.person-row{grid-template-columns:1fr 1fr;gap:6px}.person-row .btn-remove{grid-column:span 2;justify-self:end}}
+</style>
+</head>
+<body>
+
+<div class="page-title">補習班事件紀錄表</div>
+<div class="page-sub">填寫後可匯出本機 Excel，或直接記錄至 Google Drive 試算表</div>
+
+<div class="form-wrap">
+
+  <!-- 基本資料 -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon" style="background:#EAF3DE;color:#3B6D11">基</div>
+      <div class="card-title">基本資料</div>
+    </div>
+    <div class="card-body g4">
+      <div class="field"><label>事件編號</label><input type="text" id="f_id" placeholder="INC-2025-001"></div>
+      <div class="field"><label>記錄日期</label><input type="date" id="f_rec_date"></div>
+      <div class="field s2"><label>發生日期時間</label><input type="datetime-local" id="f_occur_dt"></div>
+      <div class="field s2">
+        <label>發生地點</label>
+        <select id="f_location">
+          <option value="">— 請選擇 —</option>
+          <optgroup label="室內">
+            <option>教室</option><option>自習室</option><option>辦公室</option>
+            <option>諮詢室</option><option>接待區</option><option>廁所</option>
+            <option>走廊</option><option>樓梯間</option>
+          </optgroup>
+          <optgroup label="室外">
+            <option>門口／入口</option><option>停車場</option><option>戶外空間</option>
+          </optgroup>
+          <optgroup label="其他">
+            <option>線上／遠端</option><option>其他地點</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="field s2"><label>記錄人</label><input type="text" id="f_recorder" placeholder="姓名"></div>
+    </div>
+  </div>
+
+  <!-- 涉及人員 -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon" style="background:#EEEDFE;color:#3C3489">人</div>
+      <div class="card-title">涉及人員</div>
+    </div>
+    <div class="card-body">
+      <div class="people-header">
+        <span>姓名</span><span>角色</span><span>備註</span><span></span>
+      </div>
+      <div class="people-list" id="peopleList"></div>
+      <button class="btn-add" onclick="addPerson()">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        增加涉及人員
+      </button>
+    </div>
+  </div>
+
+  <!-- 事件類型 -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon" style="background:#FAEEDA;color:#633806">類</div>
+      <div class="card-title">事件類型</div>
+    </div>
+    <div class="card-body">
+      <div class="badge-row">
+        <div class="badge-opt"><input type="radio" name="etype" id="t1" value="行為問題"><label for="t1">行為問題</label></div>
+        <div class="badge-opt"><input type="radio" name="etype" id="t2" value="情緒問題"><label for="t2">情緒問題</label></div>
+        <div class="badge-opt"><input type="radio" name="etype" id="t3" value="學習問題"><label for="t3">學習問題</label></div>
+        <div class="badge-opt"><input type="radio" name="etype" id="t4" value="家長溝通"><label for="t4">家長溝通</label></div>
+        <div class="badge-opt"><input type="radio" name="etype" id="t5" value="客訴／衝突"><label for="t5">客訴／衝突</label></div>
+        <div class="badge-opt"><input type="radio" name="etype" id="t6" value="同事溝通"><label for="t6">同事溝通</label></div>
+        <div class="badge-opt"><input type="radio" name="etype" id="t7" value="安全事件"><label for="t7">安全事件</label></div>
+        <div class="badge-opt"><input type="radio" name="etype" id="t8" value="其他"><label for="t8">其他</label></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 事件描述 -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon" style="background:#FAECE7;color:#712B13">描</div>
+      <div class="card-title">事件描述與分析</div>
+    </div>
+    <div class="card-body">
+      <div class="field"><label>事件事實經過</label><textarea id="f_desc" placeholder="請客觀描述事件發生的經過，避免主觀判斷…"></textarea></div>
+      <div class="field"><label>初步原因分析</label><textarea id="f_analysis" placeholder="可能的成因、背景因素…"></textarea></div>
+    </div>
+  </div>
+
+  <!-- 處理記錄 -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon" style="background:#E1F5EE;color:#085041">處</div>
+      <div class="card-title">當下處理與溝通記錄</div>
+    </div>
+    <div class="card-body">
+      <div class="field"><label>當下處理方式</label><textarea id="f_handle" placeholder="採取的即時措施…"></textarea></div>
+      <div class="field"><label>與學生的對話紀錄</label><textarea id="f_student_talk" placeholder="重點對話內容…"></textarea></div>
+      <div class="field"><label>與家長的溝通紀錄</label><textarea id="f_parent_talk" placeholder="通話/面談內容摘要…"></textarea></div>
+      <div class="field"><label>內部討論紀錄</label><textarea id="f_internal" placeholder="與同事/主管的討論內容…"></textarea></div>
+    </div>
+  </div>
+
+  <!-- 結論與後續 -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon" style="background:#E6F1FB;color:#0C447C">結</div>
+      <div class="card-title">共識結論與後續行動</div>
+    </div>
+    <div class="card-body g2">
+      <div class="field s2"><label>共識與結論</label><textarea id="f_conclusion" placeholder="各方達成的共識…"></textarea></div>
+      <div class="field s2"><label>後續行動計畫</label><textarea id="f_action" placeholder="具體行動項目、負責人…"></textarea></div>
+      <div class="field"><label>追蹤日期</label><input type="date" id="f_followup_date"></div>
+      <div class="field s2"><label>追蹤紀錄</label><textarea id="f_followup" placeholder="後續追蹤的結果與觀察…"></textarea></div>
+    </div>
+  </div>
+
+  <div class="legal-box">
+    <strong style="display:block;margin-bottom:3px;font-size:12px;color:var(--color-text-primary)">法律聲明</strong>
+    本紀錄為當下觀察與溝通之事實記錄，非最終判定，後續將依學生最佳利益持續調整處理方式。
+  </div>
+
+  <div class="actions">
+    <button class="btn-reset" onclick="resetForm()">清除表單</button>
+    <button class="btn-export" onclick="exportExcel()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 10v3h10v-3M7 1v8m0 0L4.5 6.5M7 9l2.5-2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      匯出本機 Excel
+    </button>
+    <button class="btn-cloud" onclick="openCloudModal()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10.5 9a2.5 2.5 0 000-5 2.5 2.5 0 00-4.9-.7A2 2 0 103.5 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 9v4m0 0l-1.5-1.5M7 13l1.5-1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      記錄至 Google Drive
+    </button>
+  </div>
+</div>
+
+<!-- Cloud Modal -->
+<div class="modal-bg" id="cloudModal">
+  <div class="modal">
+    <div class="modal-title">記錄至 Google Drive 試算表</div>
+    <div class="modal-sub">將本筆紀錄寫入 <strong>wufatw@gmail.com</strong> Google Drive 的 <strong>KidcastleEvent</strong> 工作表。</div>
+
+    <!-- Step 1: Spreadsheet ID -->
+    <span class="step-label">步驟 1 — 設定試算表</span>
+    <div class="field" style="margin-bottom:11px">
+      <label>Google Sheets ID</label>
+      <input type="text" id="m_sheetid" placeholder="從試算表網址複製，如 1BxiM...">
+    </div>
+    <div class="tip tip-blue" style="margin-bottom:14px">
+      開啟 <a href="https://drive.google.com" target="_blank" style="color:#185FA5;font-weight:500">Google Drive</a>，找到您的試算表並開啟，複製網址中 <code>/d/</code> 與 <code>/edit</code> 之間的 ID 貼入上方欄位。<br>
+      工作表名稱將固定使用 <strong>KidcastleEvent</strong>。
+    </div>
+
+    <hr class="divider">
+
+    <!-- Step 2: Auth -->
+    <span class="step-label">步驟 2 — 登入 Google 帳號授權</span>
+    <div id="authStatus" class="tip tip-blue" style="margin-bottom:11px">尚未登入，請點選下方按鈕以 wufatw@gmail.com 帳號登入。</div>
+    <button class="auth-btn" id="authBtn" onclick="doAuth()">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+      使用 Google 帳號登入
+    </button>
+
+    <div id="cloudStatus" style="display:none;margin-top:10px;padding:9px 12px;border-radius:6px;font-size:12px;line-height:1.6"></div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">取消</button>
+      <button class="btn-send" id="btnSend" onclick="sendToSheets()" disabled>寫入試算表</button>
+    </div>
+  </div>
+</div>
+
+<!-- Google API -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<script>
+const SHEET_NAME='KidcastleEvent';
+const SCOPES='https://www.googleapis.com/auth/spreadsheets';
+// Client ID: user must provide their own OR use API key flow
+// For demo we use the OAuth token flow via GIS
+let accessToken=null;
+let tokenClient=null;
+let personCount=0;
+
+/* ── People ── */
+function addPerson(name='',role='',note=''){
+  personCount++;
+  const id=personCount;
+  const roles=['學生','家長/監護人','負責老師','主管','行政人員','其他'];
+  const opts=roles.map(r=>`<option${r===role?' selected':''}>${r}</option>`).join('');
+  const row=document.createElement('div');
+  row.className='person-row';row.id='pr_'+id;
+  row.innerHTML=`<input type="text" placeholder="姓名" value="${name}" id="pname_${id}"><select id="prole_${id}">${opts}</select><input type="text" placeholder="備註" value="${note}" id="pnote_${id}"><button class="btn-remove" onclick="removePerson(${id})" title="移除">×</button>`;
+  document.getElementById('peopleList').appendChild(row);
+}
+function removePerson(id){const el=document.getElementById('pr_'+id);if(el)el.remove()}
+function getPeople(){
+  return Array.from(document.querySelectorAll('#peopleList .person-row')).map(r=>{
+    const id=r.id.replace('pr_','');
+    return{name:document.getElementById('pname_'+id)?.value.trim()||'',role:document.getElementById('prole_'+id)?.value||'',note:document.getElementById('pnote_'+id)?.value.trim()||''}
+  }).filter(p=>p.name);
+}
+
+/* ── Form data ── */
+function v(id){const el=document.getElementById(id);return el?el.value.trim():''}
+function getType(){const r=document.querySelector('input[name="etype"]:checked');return r?r.value:''}
+function collectData(){
+  const people=getPeople();
+  const peopleStr=people.map(p=>`${p.name}（${p.role}${p.note?'，'+p.note:''}）`).join('；');
+  return['事件編號','記錄日期','發生日期時間','發生地點','記錄人'].map((_,i)=>'').reduce((_,__)=>{},null),
+  {
+    '事件編號':v('f_id'),'記錄日期':v('f_rec_date'),'發生日期時間':v('f_occur_dt'),
+    '發生地點':v('f_location'),'記錄人':v('f_recorder'),'涉及人員':peopleStr,
+    '事件類型':getType(),'事件事實經過':v('f_desc'),'初步原因分析':v('f_analysis'),
+    '當下處理方式':v('f_handle'),'與學生的對話紀錄':v('f_student_talk'),
+    '與家長的溝通紀錄':v('f_parent_talk'),'內部討論紀錄':v('f_internal'),
+    '共識與結論':v('f_conclusion'),'後續行動計畫':v('f_action'),
+    '追蹤日期':v('f_followup_date'),'追蹤紀錄':v('f_followup')
+  };
+}
+
+/* ── Modal ── */
+function openCloudModal(){document.getElementById('cloudModal').classList.add('open')}
+function closeModal(){document.getElementById('cloudModal').classList.remove('open');setStatus('')}
+function setStatus(msg,type=''){
+  const el=document.getElementById('cloudStatus');
+  if(!msg){el.style.display='none';return}
+  el.style.display='block';
+  el.style.background=type==='ok'?'#EAF3DE':type==='err'?'#FCEBEB':'#E6F1FB';
+  el.style.border='0.5px solid '+(type==='ok'?'#C0DD97':type==='err'?'#F7C1C1':'#B5D4F4');
+  el.style.color=type==='ok'?'#3B6D11':type==='err'?'#A32D2D':'#185FA5';
+  el.textContent=msg;
+}
+
+/* ── Google Auth (GIS token client) ── */
+function doAuth(){
+  if(!window.google){setStatus('Google 登入元件尚未載入，請稍後再試。','err');return}
+  if(!tokenClient){
+    // We use a public readonly demo client — user should replace with their own
+    tokenClient=google.accounts.oauth2.initTokenClient({
+      client_id:'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
+      scope:SCOPES,
+      hint:'wufatw@gmail.com',
+      callback:(resp)=>{
+        if(resp.error){setStatus('授權失敗：'+resp.error,'err');return}
+        accessToken=resp.access_token;
+        document.getElementById('authStatus').className='tip tip-green';
+        document.getElementById('authStatus').textContent='已成功登入 Google 帳號，可按下「寫入試算表」送出資料。';
+        document.getElementById('btnSend').disabled=false;
+        document.getElementById('authBtn').textContent='重新授權';
+        document.getElementById('authBtn').style.background='#3B6D11';
+      }
+    });
+  }
+  tokenClient.requestAccessToken({prompt:'consent'});
+}
+
+/* ── Write to Sheets ── */
+async function sendToSheets(){
+  const sid=v('m_sheetid');
+  if(!sid){setStatus('請填入 Google Sheets ID','err');return}
+  if(!accessToken){setStatus('請先登入 Google 帳號','err');return}
+
+  const btn=document.getElementById('btnSend');
+  btn.disabled=true;btn.textContent='寫入中…';
+  setStatus('正在連線至 Google Sheets…');
+
+  const data=collectData();
+  const headers=Object.keys(data);
+  const values=Object.values(data).map(v=>v||'');
+
+  try{
+    // 1. Check if header row exists
+    const getUrl=`https://sheets.googleapis.com/v4/spreadsheets/${sid}/values/${encodeURIComponent(SHEET_NAME+'!A1:R1')}`;
+    const getRes=await fetch(getUrl,{headers:{Authorization:'Bearer '+accessToken}});
+    if(!getRes.ok){
+      const e=await getRes.json();
+      if(getRes.status===404||getRes.status===400){
+        setStatus('找不到試算表或工作表「KidcastleEvent」，請確認 ID 正確，並已建立該工作表。','err');
+      } else {
+        setStatus('讀取失敗：'+(e.error?.message||getRes.status),'err');
+      }
+      btn.disabled=false;btn.textContent='寫入試算表';return;
+    }
+    const getJson=await getRes.json();
+    const hasHeader=getJson.values&&getJson.values[0]&&getJson.values[0].length>0;
+
+    // 2. Write header if missing
+    if(!hasHeader){
+      await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sid}/values/${encodeURIComponent(SHEET_NAME+'!A1')}:append?valueInputOption=RAW`,{
+        method:'POST',headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},
+        body:JSON.stringify({values:[headers]})
+      });
+    }
+
+    // 3. Append data row
+    const appendUrl=`https://sheets.googleapis.com/v4/spreadsheets/${sid}/values/${encodeURIComponent(SHEET_NAME+'!A1')}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`;
+    const appendRes=await fetch(appendUrl,{
+      method:'POST',headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},
+      body:JSON.stringify({values:[values]})
+    });
+    if(appendRes.ok){
+      const j=await appendRes.json();
+      const range=j.updates?.updatedRange||'';
+      setStatus('成功寫入！資料已儲存至 KidcastleEvent 工作表'+(range?' ('+range+')':'')+'。','ok');
+    } else {
+      const e=await appendRes.json();
+      setStatus('寫入失敗：'+(e.error?.message||appendRes.status),'err');
+    }
+  }catch(e){
+    setStatus('連線錯誤：'+e.message,'err');
+  }
+  btn.disabled=false;btn.textContent='寫入試算表';
+}
+
+/* ── Export Excel ── */
+function exportExcel(){
+  const data=collectData();
+  const wb=XLSX.utils.book_new();
+  const rows=[['補習班事件紀錄表',''],['匯出時間',new Date().toLocaleString('zh-TW')],['','']];
+  const secs=[
+    {t:'基本資料',k:['事件編號','記錄日期','發生日期時間','發生地點','記錄人']},
+    {t:'涉及人員',k:['涉及人員']},{t:'事件類型',k:['事件類型']},
+    {t:'事件描述與分析',k:['事件事實經過','初步原因分析']},
+    {t:'處理與溝通記錄',k:['當下處理方式','與學生的對話紀錄','與家長的溝通紀錄','內部討論紀錄']},
+    {t:'結論與後續',k:['共識與結論','後續行動計畫','追蹤日期','追蹤紀錄']}
+  ];
+  secs.forEach(s=>{rows.push([s.t,'']);s.k.forEach(k=>rows.push([k,data[k]||'']));rows.push(['',''])});
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=[{wch:22},{wch:60}];
+  XLSX.utils.book_append_sheet(wb,ws,'事件紀錄');
+  const ws2=XLSX.utils.aoa_to_sheet([Object.keys(data),[...Object.values(data)]]);
+  XLSX.utils.book_append_sheet(wb,ws2,'原始資料');
+  XLSX.writeFile(wb,`補習班事件紀錄_${v('f_id')||'事件'}_${v('f_rec_date')||new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+/* ── Reset ── */
+function resetForm(){
+  if(!confirm('確定清除所有已填寫的內容？'))return;
+  ['f_id','f_rec_date','f_occur_dt','f_recorder','f_desc','f_analysis','f_handle','f_student_talk','f_parent_talk','f_internal','f_conclusion','f_action','f_followup_date','f_followup'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+  document.getElementById('f_location').value='';
+  document.querySelectorAll('input[name="etype"]').forEach(r=>r.checked=false);
+  document.getElementById('peopleList').innerHTML='';
+  personCount=0;
+  addPerson('','學生','');addPerson('','家長/監護人','');addPerson('','負責老師','');
+}
+
+// Fix collectData (clean up the accidental reduce)
+const _collectData=collectData;
+function collectData(){
+  const people=getPeople();
+  const peopleStr=people.map(p=>`${p.name}（${p.role}${p.note?'，'+p.note:''}）`).join('；');
+  return{
+    '事件編號':v('f_id'),'記錄日期':v('f_rec_date'),'發生日期時間':v('f_occur_dt'),
+    '發生地點':v('f_location'),'記錄人':v('f_recorder'),'涉及人員':peopleStr,
+    '事件類型':getType(),'事件事實經過':v('f_desc'),'初步原因分析':v('f_analysis'),
+    '當下處理方式':v('f_handle'),'與學生的對話紀錄':v('f_student_talk'),
+    '與家長的溝通紀錄':v('f_parent_talk'),'內部討論紀錄':v('f_internal'),
+    '共識與結論':v('f_conclusion'),'後續行動計畫':v('f_action'),
+    '追蹤日期':v('f_followup_date'),'追蹤紀錄':v('f_followup')
+  };
+}
+
+// Init
+document.getElementById('f_rec_date').value=new Date().toISOString().slice(0,10);
+addPerson('','學生','');addPerson('','家長/監護人','');addPerson('','負責老師','');
+</script>
+</body>
+</html>
