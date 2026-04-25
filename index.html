@@ -1,320 +1,254 @@
-
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>公共事務紀錄系統</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--color-background-tertiary)}
-.wrap{max-width:780px;margin:0 auto;padding:1.5rem 1rem}
-.page-title{font-size:22px;font-weight:500;color:var(--color-text-primary)}
-.page-sub{font-size:13px;color:var(--color-text-secondary);margin-top:4px}
-.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-top:1rem}
-.card-title{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:1rem;display:flex;align-items:center;gap:8px}
-.badge{font-size:11px;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-info);color:var(--color-text-info);font-weight:400}
-.tabs{display:flex;gap:4px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:4px;margin-top:1rem}
-.tab{flex:1;padding:6px 8px;font-size:13px;text-align:center;cursor:pointer;border-radius:6px;color:var(--color-text-secondary);border:none;background:none;transition:all .15s}
-.tab.active{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500;border:0.5px solid var(--color-border-tertiary)}
-.section{display:none}
-.section.active{display:block}
-.form-group{margin-bottom:1rem}
-label{font-size:13px;color:var(--color-text-secondary);display:block;margin-bottom:4px}
-input,select,textarea{width:100%;font-size:14px;padding:8px 10px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary)}
-textarea{resize:vertical;min-height:80px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-.btn{padding:8px 20px;font-size:14px;border-radius:var(--border-radius-md);cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500}
-.btn-primary{background:#185FA5;color:#E6F1FB;border-color:#185FA5}
-.btn-danger{background:var(--color-background-danger);color:var(--color-text-danger);border-color:var(--color-border-danger)}
-.btn-row{display:flex;justify-content:flex-end;gap:8px;margin-top:1rem}
-.records-list{margin-top:1rem;display:flex;flex-direction:column;gap:8px}
-.record-item{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;display:flex;justify-content:space-between;align-items:flex-start;cursor:pointer}
-.record-item:hover{border-color:var(--color-border-secondary)}
-.record-main{flex:1}
-.record-title{font-size:14px;font-weight:500;color:var(--color-text-primary)}
-.record-meta{font-size:12px;color:var(--color-text-secondary);margin-top:3px;display:flex;gap:8px;flex-wrap:wrap}
-.record-status{font-size:11px;padding:2px 8px;border-radius:var(--border-radius-md);white-space:nowrap;align-self:flex-start;margin-left:8px}
-.s-open{background:#E6F1FB;color:#185FA5}
-.s-progress{background:#FAEEDA;color:#854F0B}
-.s-done{background:#EAF3DE;color:#3B6D11}
-.s-urgent{background:#FCEBEB;color:#A32D2D}
-.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:1rem}
-.stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px;text-align:center}
-.stat-num{font-size:24px;font-weight:500;color:var(--color-text-primary)}
-.stat-label{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
-.empty{text-align:center;padding:2rem;font-size:14px;color:var(--color-text-secondary)}
-.detail-overlay{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.35);z-index:10;align-items:center;justify-content:center;min-height:400px}
-.detail-overlay.show{display:flex}
-.detail-card{background:var(--color-background-primary);border-radius:var(--border-radius-lg);padding:1.5rem;max-width:500px;width:90%;border:0.5px solid var(--color-border-tertiary)}
-.detail-field{margin-bottom:10px;font-size:13px}
-.detail-field span{color:var(--color-text-secondary);display:block;font-size:12px}
-.cat-selector{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem}
-.cat-btn{font-size:12px;padding:4px 10px;border-radius:var(--border-radius-md);cursor:pointer;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-secondary)}
-.cat-btn.active{border-color:#185FA5;color:#185FA5;background:#E6F1FB}
-.divider{height:0.5px;background:var(--color-border-tertiary);margin:1rem 0}
+:root{
+  --c-bg:#F7F6F2;
+  --c-surface:#FFFFFF;
+  --c-border:#E2E0D8;
+  --c-text:#1A1A18;
+  --c-text-sub:#6B6B65;
+  --c-text-hint:#9C9C96;
+  --c-accent:#1A4FA0;
+  --c-accent-light:#E8EEF9;
+  --c-warn:#8C4A00;
+  --c-warn-light:#FDF0E3;
+  --c-danger:#8C1A1A;
+  --c-danger-light:#FCEAEA;
+  --c-success:#1A5C35;
+  --c-success-light:#E8F5EE;
+  --radius:10px;
+  --radius-lg:14px;
+}
+body{
+  font-family:'Noto Sans TC',system-ui,sans-serif;
+  background:var(--c-bg);
+  color:var(--c-text);
+  min-height:100vh;
+  padding:2.5rem 1.5rem 4rem;
+}
+.page-wrap{max-width:860px;margin:0 auto}
+
+/* header */
+.site-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:2.5rem;
+  padding-bottom:1.5rem;
+  border-bottom:1px solid var(--c-border);
+}
+.site-brand{}
+.site-title{font-size:24px;font-weight:700;letter-spacing:-.3px;color:var(--c-text)}
+.site-sub{font-size:13px;color:var(--c-text-sub);margin-top:5px}
+.site-date{font-size:12px;color:var(--c-text-hint);white-space:nowrap;padding-top:4px}
+
+/* section label */
+.section-label{
+  font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--c-text-hint);margin-bottom:.8rem;margin-top:2rem;
+}
+
+/* module grid */
+.module-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+
+/* module card */
+.mod-card{
+  background:var(--c-surface);
+  border:1px solid var(--c-border);
+  border-radius:var(--radius-lg);
+  padding:1.25rem 1.4rem;
+  text-decoration:none;
+  color:inherit;
+  display:block;
+  transition:box-shadow .15s,border-color .15s,transform .12s;
+  position:relative;
+  overflow:hidden;
+}
+.mod-card:hover{
+  border-color:#A8B8D8;
+  box-shadow:0 4px 18px rgba(26,79,160,.08);
+  transform:translateY(-2px);
+}
+.mod-card::before{
+  content:'';position:absolute;top:0;left:0;width:4px;height:100%;
+  background:var(--stripe,var(--c-accent));
+  border-radius:var(--radius-lg) 0 0 var(--radius-lg);
+}
+
+.mod-icon{
+  width:38px;height:38px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;margin-bottom:.85rem;
+  background:var(--icon-bg,var(--c-accent-light));
+}
+.mod-name{font-size:16px;font-weight:700;margin-bottom:.3rem}
+.mod-desc{font-size:13px;color:var(--c-text-sub);line-height:1.6}
+.mod-path{
+  font-size:11px;color:var(--c-text-hint);
+  margin-top:.9rem;font-family:monospace;
+  background:var(--c-bg);border:1px solid var(--c-border);
+  padding:3px 8px;border-radius:5px;display:inline-block;
+}
+.mod-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:.7rem}
+.tag{
+  font-size:11px;padding:2px 9px;border-radius:5px;
+  background:var(--c-bg);color:var(--c-text-sub);
+  border:1px solid var(--c-border);
+}
+
+/* sub-page list */
+.subpage-card{
+  background:var(--c-surface);
+  border:1px solid var(--c-border);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+}
+.subpage-row{
+  display:flex;align-items:center;gap:14px;
+  padding:.9rem 1.25rem;
+  border-bottom:1px solid var(--c-border);
+  text-decoration:none;color:inherit;
+  transition:background .1s;
+}
+.subpage-row:last-child{border-bottom:none}
+.subpage-row:hover{background:var(--c-accent-light)}
+.subpage-icon{
+  width:32px;height:32px;border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+}
+.subpage-info{flex:1}
+.subpage-name{font-size:14px;font-weight:500}
+.subpage-note{font-size:12px;color:var(--c-text-sub);margin-top:1px}
+.subpage-arrow{font-size:13px;color:var(--c-text-hint)}
+.folder-header{
+  padding:.7rem 1.25rem;
+  background:var(--c-bg);
+  border-bottom:1px solid var(--c-border);
+  font-size:12px;font-weight:700;letter-spacing:.06em;
+  color:var(--c-text-sub);display:flex;align-items:center;gap:7px;
+}
+
+/* info bar */
+.info-bar{
+  background:var(--c-accent-light);
+  border:1px solid #B8C9E8;
+  border-radius:var(--radius);
+  padding:.8rem 1.1rem;
+  font-size:13px;color:var(--c-accent);
+  margin-top:1.5rem;
+  display:flex;align-items:flex-start;gap:8px;
+  line-height:1.6;
+}
 </style>
+</head>
+<body>
+<div class="page-wrap">
 
-<div class="wrap" id="app">
-  <h1 class="page-title">校外補習班 — 公共事務紀錄系統</h1>
-  <p class="page-sub">統一管理服務事件、人員紀錄、設備異常與法規合規</p>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="site-brand">
+      <h1 class="site-title">補習班公共事務紀錄系統</h1>
+      <p class="site-sub">Shona Event Record ／ 服務異常 · 人員事件 · 線上登錄 · 法規管理</p>
+    </div>
+    <span class="site-date" id="today-date"></span>
+  </header>
 
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('dash')">總覽</button>
-    <button class="tab" onclick="switchTab('service')">服務事件</button>
-    <button class="tab" onclick="switchTab('staff')">人員紀錄</button>
-    <button class="tab" onclick="switchTab('facility')">設備環境</button>
-    <button class="tab" onclick="switchTab('compliance')">法規合規</button>
+  <!-- 主模組 -->
+  <p class="section-label">功能模組</p>
+  <div class="module-grid">
+
+    <a href="Incident/ServiceFailure.html" class="mod-card" style="--stripe:#C0392B;--icon-bg:#FCEAEA;">
+      <div class="mod-icon" style="font-size:20px;">🚨</div>
+      <div class="mod-name">服務異常紀錄</div>
+      <div class="mod-desc">記錄補習班服務過程中發生的異常事件，包含家長投訴、突發狀況、課程糾紛等。</div>
+      <div class="mod-tags">
+        <span class="tag">家長投訴</span>
+        <span class="tag">突發事件</span>
+        <span class="tag">糾紛處理</span>
+      </div>
+      <div class="mod-path">Incident / ServiceFailure.html</div>
+    </a>
+
+    <a href="UnfitStaffEvent/RecordOnLine.html" class="mod-card" style="--stripe:#1A4FA0;--icon-bg:#E8EEF9;">
+      <div class="mod-icon" style="font-size:20px;">📋</div>
+      <div class="mod-name">不適任人員線上登錄</div>
+      <div class="mod-desc">針對教師或行政人員的不適任行為進行線上紀錄，依規定格式完整填報。</div>
+      <div class="mod-tags">
+        <span class="tag">教師行為</span>
+        <span class="tag">線上登錄</span>
+        <span class="tag">行政紀錄</span>
+      </div>
+      <div class="mod-path">UnfitStaffEvent / RecordOnLine.html</div>
+    </a>
+
+    <a href="UnfitStaffEvent/Regulation.html" class="mod-card" style="--stripe:#1A5C35;--icon-bg:#E8F5EE;">
+      <div class="mod-icon" style="font-size:20px;">📖</div>
+      <div class="mod-name">相關法規說明</div>
+      <div class="mod-desc">補充說明補習班法、教師輔導管教辦法及不適任人員處理程序的相關法規條文。</div>
+      <div class="mod-tags">
+        <span class="tag">補習班法</span>
+        <span class="tag">處理程序</span>
+        <span class="tag">法規條文</span>
+      </div>
+      <div class="mod-path">UnfitStaffEvent / Regulation.html</div>
+    </a>
+
   </div>
 
-  <!-- 總覽 -->
-  <div id="dash" class="section active">
-    <div class="stat-row" id="stats"></div>
-    <div class="card">
-      <div class="card-title">近期待處理事項</div>
-      <div id="dash-list" class="records-list"></div>
+  <!-- 目錄結構 -->
+  <p class="section-label" style="margin-top:2.5rem">目錄結構與子頁面</p>
+  <div class="subpage-card">
+
+    <div class="folder-header">
+      <span>📁</span> Incident
     </div>
+    <a href="Incident/ServiceFailure.html" class="subpage-row">
+      <div class="subpage-icon" style="background:#FCEAEA;">📄</div>
+      <div class="subpage-info">
+        <div class="subpage-name">ServiceFailure.html</div>
+        <div class="subpage-note">服務異常事件填報表單 — 443 行</div>
+      </div>
+      <span class="subpage-arrow">›</span>
+    </a>
+
+    <div class="folder-header">
+      <span>📁</span> UnfitStaffEvent
+    </div>
+    <a href="UnfitStaffEvent/RecordOnLine.html" class="subpage-row">
+      <div class="subpage-icon" style="background:#E8EEF9;">📄</div>
+      <div class="subpage-info">
+        <div class="subpage-name">RecordOnLine.html</div>
+        <div class="subpage-note">不適任人員線上登錄表單</div>
+      </div>
+      <span class="subpage-arrow">›</span>
+    </a>
+    <a href="UnfitStaffEvent/Regulation.html" class="subpage-row">
+      <div class="subpage-icon" style="background:#E8F5EE;">📄</div>
+      <div class="subpage-info">
+        <div class="subpage-name">Regulation.html</div>
+        <div class="subpage-note">相關法規條文說明頁</div>
+      </div>
+      <span class="subpage-arrow">›</span>
+    </a>
+
   </div>
 
-  <!-- 服務事件 -->
-  <div id="service" class="section">
-    <div class="card">
-      <div class="card-title">新增服務事件 <span class="badge">家長投訴 / 學生糾紛 / 突發狀況</span></div>
-      <div class="row">
-        <div class="form-group"><label>事件日期</label><input type="date" id="sv-date"></div>
-        <div class="form-group"><label>事件類別</label>
-          <select id="sv-cat">
-            <option>家長投訴</option><option>學生糾紛</option><option>突發傷病</option>
-            <option>財物糾紛</option><option>課程異議</option><option>其他</option>
-          </select>
-        </div>
-      </div>
-      <div class="row">
-        <div class="form-group"><label>涉及人員</label><input type="text" id="sv-person" placeholder="姓名（選填）"></div>
-        <div class="form-group"><label>處理狀態</label>
-          <select id="sv-status"><option value="open">待處理</option><option value="progress">處理中</option><option value="done">已結案</option><option value="urgent">緊急</option></select>
-        </div>
-      </div>
-      <div class="form-group"><label>事件摘要</label><input type="text" id="sv-title" placeholder="請簡述事件（必填）"></div>
-      <div class="form-group"><label>處理經過與說明</label><textarea id="sv-desc" placeholder="詳述事件始末、處理方式、後續追蹤..."></textarea></div>
-      <div class="form-group"><label>處理人員</label><input type="text" id="sv-handler" placeholder="負責處理之教師或行政人員"></div>
-      <div class="btn-row"><button class="btn btn-primary" onclick="addRecord('service')">新增紀錄</button></div>
-    </div>
-    <div class="card">
-      <div class="card-title">服務事件紀錄</div>
-      <div id="service-list" class="records-list"></div>
-    </div>
+  <div class="info-bar">
+    <span>ℹ️</span>
+    <span>本系統採靜態 HTML 架構，所有頁面皆可直接開啟瀏覽。如需線上存取，請將整個資料夾部署至 GitHub Pages 或任何靜態主機，確保各子目錄路徑一致即可正常連結。</span>
   </div>
 
-  <!-- 人員紀錄 -->
-  <div id="staff" class="section">
-    <div class="card">
-      <div class="card-title">新增人員異常紀錄 <span class="badge">教師 / 行政 / 工讀生</span></div>
-      <div class="row">
-        <div class="form-group"><label>日期</label><input type="date" id="st-date"></div>
-        <div class="form-group"><label>人員類別</label>
-          <select id="st-cat"><option>教師</option><option>行政人員</option><option>工讀生</option><option>義工</option></select>
-        </div>
-      </div>
-      <div class="row">
-        <div class="form-group"><label>姓名</label><input type="text" id="st-name" placeholder="人員姓名"></div>
-        <div class="form-group"><label>異常類型</label>
-          <select id="st-type"><option>遲到/早退</option><option>曠職</option><option>行為不當</option><option>投訴</option><option>獎懲事項</option></select>
-        </div>
-      </div>
-      <div class="form-group"><label>事件摘要</label><input type="text" id="st-title" placeholder="請簡述（必填）"></div>
-      <div class="form-group"><label>詳細說明</label><textarea id="st-desc" placeholder="說明經過、佐證、後續處置..."></textarea></div>
-      <div class="btn-row"><button class="btn btn-primary" onclick="addRecord('staff')">新增紀錄</button></div>
-    </div>
-    <div class="card">
-      <div class="card-title">人員紀錄列表</div>
-      <div id="staff-list" class="records-list"></div>
-    </div>
-  </div>
-
-  <!-- 設備環境 -->
-  <div id="facility" class="section">
-    <div class="card">
-      <div class="card-title">設備/環境異常紀錄</div>
-      <div class="row">
-        <div class="form-group"><label>日期</label><input type="date" id="fc-date"></div>
-        <div class="form-group"><label>地點/設備</label>
-          <select id="fc-loc">
-            <option>教室A</option><option>教室B</option><option>洗手間</option>
-            <option>走廊/逃生通道</option><option>辦公室</option><option>外部設施</option>
-          </select>
-        </div>
-      </div>
-      <div class="row">
-        <div class="form-group"><label>異常類型</label>
-          <select id="fc-cat"><option>設備故障</option><option>安全疑慮</option><option>衛生問題</option><option>消防/逃生設備</option><option>漏水/損壞</option></select>
-        </div>
-        <div class="form-group"><label>處理狀態</label>
-          <select id="fc-status"><option value="open">待修繕</option><option value="progress">維修中</option><option value="done">已完成</option><option value="urgent">緊急</option></select>
-        </div>
-      </div>
-      <div class="form-group"><label>異常摘要</label><input type="text" id="fc-title" placeholder="請簡述（必填）"></div>
-      <div class="form-group"><label>說明與處置</label><textarea id="fc-desc" placeholder="描述問題狀況、初步處理、通報廠商..."></textarea></div>
-      <div class="btn-row"><button class="btn btn-primary" onclick="addRecord('facility')">新增紀錄</button></div>
-    </div>
-    <div class="card">
-      <div class="card-title">設備紀錄列表</div>
-      <div id="facility-list" class="records-list"></div>
-    </div>
-  </div>
-
-  <!-- 法規合規 -->
-  <div id="compliance" class="section">
-    <div class="card">
-      <div class="card-title">法規合規事項紀錄 <span class="badge">補習班法 / 消防 / 食安</span></div>
-      <div class="row">
-        <div class="form-group"><label>日期</label><input type="date" id="co-date"></div>
-        <div class="form-group"><label>法規類別</label>
-          <select id="co-cat"><option>補習班立案/換證</option><option>消防安全檢查</option><option>食品衛生</option><option>個資保護</option><option>勞動法規</option><option>主管機關稽查</option></select>
-        </div>
-      </div>
-      <div class="row">
-        <div class="form-group"><label>辦理結果</label>
-          <select id="co-status"><option value="done">已完成</option><option value="open">待辦</option><option value="progress">辦理中</option><option value="urgent">逾期/異常</option></select>
-        </div>
-        <div class="form-group"><label>下次到期日</label><input type="date" id="co-expire"></div>
-      </div>
-      <div class="form-group"><label>事項摘要</label><input type="text" id="co-title" placeholder="請簡述（必填）"></div>
-      <div class="form-group"><label>詳細說明</label><textarea id="co-desc" placeholder="辦理內容、附件單號、主管機關、後續追蹤事項..."></textarea></div>
-      <div class="btn-row"><button class="btn btn-primary" onclick="addRecord('compliance')">新增紀錄</button></div>
-    </div>
-    <div class="card">
-      <div class="card-title">法規合規紀錄列表</div>
-      <div id="compliance-list" class="records-list"></div>
-    </div>
-  </div>
 </div>
-
-<!-- 詳細資料覆蓋層 -->
-<div class="detail-overlay" id="overlay" onclick="closeDetail(event)">
-  <div class="detail-card" id="detail-card"></div>
-</div>
-
 <script>
-const CAT_LABELS={service:'服務事件',staff:'人員紀錄',facility:'設備環境',compliance:'法規合規'};
-const STATUS_LABEL={open:'待處理',progress:'處理中',done:'已完成',urgent:'緊急'};
-const STATUS_CLASS={open:'s-open',progress:'s-progress',done:'s-done',urgent:'s-urgent'};
-
-let db={service:[],staff:[],facility:[],compliance:[]};
-let today=new Date().toISOString().slice(0,10);
-
-['sv-date','st-date','fc-date','co-date'].forEach(id=>{
-  const el=document.getElementById(id);if(el)el.value=today;
-});
-
-function switchTab(name){
-  document.querySelectorAll('.tab').forEach((t,i)=>{
-    const tabs=['dash','service','staff','facility','compliance'];
-    t.classList.toggle('active',tabs[i]===name);
-  });
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.getElementById(name).classList.add('active');
-  if(name==='dash')renderDash();
-}
-
-function addRecord(cat){
-  const map={
-    service:{date:'sv-date',cat:'sv-cat',person:'sv-person',status:'sv-status',title:'sv-title',desc:'sv-desc',handler:'sv-handler'},
-    staff:{date:'st-date',cat:'st-cat',name:'st-name',type:'st-type',title:'st-title',desc:'st-desc'},
-    facility:{date:'fc-date',loc:'fc-loc',cat:'fc-cat',status:'fc-status',title:'fc-title',desc:'fc-desc'},
-    compliance:{date:'co-date',cat:'co-cat',status:'co-status',expire:'co-expire',title:'co-title',desc:'co-desc'}
-  };
-  const f=map[cat];
-  const title=document.getElementById(f.title).value.trim();
-  if(!title){alert('請填寫事項摘要');return;}
-  const rec={id:Date.now(),cat};
-  Object.entries(f).forEach(([k,id])=>{const el=document.getElementById(id);if(el)rec[k]=el.value;});
-  if(!rec.status)rec.status='done';
-  db[cat].unshift(rec);
-  renderList(cat);
-  renderDash();
-  Object.values(f).forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el)return;
-    if(el.tagName==='INPUT'&&el.type!=='date')el.value='';
-    else if(el.tagName==='TEXTAREA')el.value='';
-  });
-}
-
-function renderList(cat){
-  const el=document.getElementById(cat+'-list');
-  if(!el)return;
-  if(!db[cat].length){el.innerHTML='<div class="empty">尚無紀錄</div>';return;}
-  el.innerHTML=db[cat].map(r=>`
-    <div class="record-item" onclick="showDetail('${cat}',${r.id})">
-      <div class="record-main">
-        <div class="record-title">${r.title}</div>
-        <div class="record-meta">
-          <span>${r.date||''}</span>
-          ${r.cat?`<span>${r.cat}</span>`:''}
-          ${r.person?`<span>涉及：${r.person}</span>`:''}
-          ${r.name?`<span>${r.name}</span>`:''}
-          ${r.loc?`<span>${r.loc}</span>`:''}
-          ${r.expire?`<span>到期：${r.expire}</span>`:''}
-          ${r.handler?`<span>處理：${r.handler}</span>`:''}
-        </div>
-      </div>
-      <span class="record-status ${STATUS_CLASS[r.status]||'s-open'}">${STATUS_LABEL[r.status]||r.status}</span>
-    </div>
-  `).join('');
-}
-
-function renderDash(){
-  const all=Object.entries(db).flatMap(([c,arr])=>arr.map(r=>({...r,_cat:c})));
-  const stats={total:all.length,urgent:all.filter(r=>r.status==='urgent').length,open:all.filter(r=>r.status==='open').length,done:all.filter(r=>r.status==='done').length};
-  document.getElementById('stats').innerHTML=`
-    <div class="stat"><div class="stat-num">${stats.total}</div><div class="stat-label">全部紀錄</div></div>
-    <div class="stat"><div class="stat-num" style="color:#A32D2D">${stats.urgent}</div><div class="stat-label">緊急待辦</div></div>
-    <div class="stat"><div class="stat-num" style="color:#185FA5">${stats.open}</div><div class="stat-label">待處理</div></div>
-    <div class="stat"><div class="stat-num" style="color:#3B6D11">${stats.done}</div><div class="stat-label">已完成</div></div>
-  `;
-  const pending=all.filter(r=>r.status!=='done').slice(0,8);
-  const el=document.getElementById('dash-list');
-  if(!pending.length){el.innerHTML='<div class="empty">目前無待處理事項</div>';return;}
-  el.innerHTML=pending.map(r=>`
-    <div class="record-item" onclick="showDetail('${r._cat}',${r.id})">
-      <div class="record-main">
-        <div class="record-title">${r.title}</div>
-        <div class="record-meta"><span>${CAT_LABELS[r._cat]}</span><span>${r.date||''}</span></div>
-      </div>
-      <span class="record-status ${STATUS_CLASS[r.status]||'s-open'}">${STATUS_LABEL[r.status]||r.status}</span>
-    </div>
-  `).join('');
-}
-
-function showDetail(cat,id){
-  const r=db[cat].find(x=>x.id===id);if(!r)return;
-  const fields=Object.entries(r).filter(([k])=>!['id','cat','_cat'].includes(k));
-  const labels={date:'日期',cat:'類別',person:'涉及人員',status:'狀態',title:'摘要',desc:'說明',handler:'處理人員',name:'姓名',type:'異常類型',loc:'地點',expire:'到期日'};
-  document.getElementById('detail-card').innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-      <div style="font-size:15px;font-weight:500">${r.title}</div>
-      <span class="record-status ${STATUS_CLASS[r.status]||'s-open'}">${STATUS_LABEL[r.status]||r.status}</span>
-    </div>
-    <div style="height:0.5px;background:var(--color-border-tertiary);margin-bottom:1rem"></div>
-    ${fields.filter(([k,v])=>v&&k!=='title').map(([k,v])=>`
-      <div class="detail-field"><span>${labels[k]||k}</span>${k==='status'?STATUS_LABEL[v]||v:v}</div>
-    `).join('')}
-    <div class="btn-row">
-      <button class="btn btn-danger" onclick="deleteRecord('${cat}',${id})">刪除</button>
-      <button class="btn" onclick="document.getElementById('overlay').classList.remove('show')">關閉</button>
-    </div>
-  `;
-  document.getElementById('overlay').classList.add('show');
-}
-
-function deleteRecord(cat,id){
-  db[cat]=db[cat].filter(r=>r.id!==id);
-  document.getElementById('overlay').classList.remove('show');
-  renderList(cat);renderDash();
-}
-
-function closeDetail(e){if(e.target.id==='overlay')document.getElementById('overlay').classList.remove('show');}
-
-// 示範資料
-db.service.push({id:1,date:'2026-04-24',cat:'家長投訴',person:'王小明家長',status:'progress',title:'家長反映數學課進度過快',desc:'家長來電反映其子王小明對數學課程進度感到跟不上，要求調整授課節奏或另行補救教學。',handler:'陳主任'});
-db.compliance.push({id:2,date:'2026-04-20',cat:'消防安全檢查',status:'open',title:'年度消防器材定期點檢到期',expire:'2026-05-01',desc:'依相關規定需每半年進行消防器材檢查，本次到期日為5/1，需聯繫合格廠商辦理。'});
-db.facility.push({id:3,date:'2026-04-25',loc:'洗手間',cat:'衛生問題',status:'urgent',title:'一樓廁所排水管堵塞',desc:'清潔人員回報一樓廁所排水不良，疑似有異物堵塞，已聯繫水電師傅但尚未到場。'});
-renderDash();
-['service','staff','facility','compliance'].forEach(renderList);
+const d=new Date();
+const w=['日','一','二','三','四','五','六'];
+document.getElementById('today-date').textContent=
+  d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（週'+w[d.getDay()]+'）';
 </script>
+</body>
+</html>
