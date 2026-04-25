@@ -1,1 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>員工績效輔導與資遣程序紀錄表</title>
+<style>
+    body { font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: 20px auto; padding: 20px; }
+    .section { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+    h2 { border-bottom: 2px solid #333; padding-bottom: 5px; }
+    ul { list-style: none; padding: 0; }
+    li { margin-bottom: 10px; padding: 10px; background: #f9f9f9; border-left: 5px solid #007bff; }
+    .date-input { width: 150px; }
+</style>
+</head>
+<body>
 
+<h1>員工績效輔導與資遣程序紀錄表</h1>
+
+<form>
+    <div class="section">
+        <h2>一、績效輔導期 (PIP)</h2>
+        <ul>
+            <li><input type="checkbox"> 已向員工明確告知績效未達標之具體事實與數據。</li>
+            <li><input type="checkbox"> 已交付書面「績效改善計畫 (PIP)」並詳列改善目標與期限。</li>
+            <li><input type="checkbox"> 已安排專業輔導人或主管進行指導與訓練。</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>二、客觀考核期</h2>
+        <ul>
+            <li><input type="checkbox"> 定期追蹤輔導進度，並保留每週/每月面談紀錄表。</li>
+            <li><input type="checkbox"> 已評估「調職」之可能性（若有缺額）。</li>
+            <li><input type="checkbox"> 綜合評量報告確認輔導後仍未達職務要求之具體事實。</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>三、合法終止期 (資遣)</h2>
+        <ul>
+            <li><input type="checkbox"> 依法預告資遣，預告期天數：<input type="number" class="date-input"> 天。</li>
+            <li><input type="checkbox"> 依勞基法計算資遣費明細並通知員工。</li>
+            <li><input type="checkbox"> 完成資遣通報 (通報當地主管機關與就業服務站)。</li>
+            <li><input type="checkbox"> 發給「非自願離職證明書」與相關結算文件。</li>
+        </ul>
+    </div>
+
+    <button type="button" onclick="window.print()">儲存為 PDF 或列印紀錄</button>
+</form>
+
+</body>
+</html>
